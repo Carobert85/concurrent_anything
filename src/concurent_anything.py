@@ -49,6 +49,8 @@ class _ConcurrentParent:
 
         with metafunction(max_workers) as executor:
 
+            #todo: test all iterations of this
+
             if self.args_tuple and self.kwargs_dict:  # args and kwargs
                 partial_executor = partial(executor.submit, *self.args, **self.kwargs_dict)
 
@@ -57,7 +59,6 @@ class _ConcurrentParent:
 
             elif self.kwargs_dict:  # no args kwargs
                 partial_executor = partial(executor.submit, **self.kwargs_dict)
-
 
             else:  # no args no kwargs
                 partial_executor = partial(executor.submit)
@@ -87,8 +88,8 @@ class ThreadAnything(_ConcurrentParent):
         """
         return self._concurrent_function(concurrent.futures.ThreadPoolExecutor, max_workers=max_workers)
 
-    # def __call__(self, *args, **kwargs):
-    #     self.thread_anything()
+    def __call__(self, max_workers=10):
+        return self.thread_anything(max_workers=max_workers)
 
 
 class MultiProcessAnything(_ConcurrentParent):
@@ -110,3 +111,5 @@ class MultiProcessAnything(_ConcurrentParent):
         """
         return self._concurrent_function(concurrent.futures.ProcessPoolExecutor, max_workers=max_workers)
 
+    def __call__(self, max_workers=10):
+        return self.multiprocess_anything(max_workers=max_workers)
