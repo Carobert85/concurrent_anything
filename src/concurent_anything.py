@@ -40,6 +40,18 @@ class _ConcurrentParent:
         except Exception as e:
             self.exception_dict.get(e, log_function(e))
 
+    def unpack_args(self):
+        if self.args_tuple:
+            return [*self.args_tuple]
+        else:
+            return None
+
+    # def unpack_kwargs(self):
+    #     if self.kwargs_dict:
+    #         return [**self.kwargs_dict]
+    #     else:
+    #         return None
+
     def _concurrent_function(self, metafunction, max_workers):
         """
         This is the general construct of the process and thread pool executors
@@ -51,23 +63,11 @@ class _ConcurrentParent:
         with metafunction(max_workers) as executor:
             # todo: test all iterations of this
 
-            if self.args_tuple and self.kwargs_dict:  # args and kwargs
-                futures = {executor.submit(self.function, item, *self.args_tuple, **self.kwargs_dict): item for item in
-                            self.iterable}
-
-            elif self.args_tuple:  # args no kwargs
-                futures = {executor.submit(self.function, item, *self.args_tuple): item for item in
-                            self.iterable}
-
-            elif self.kwargs_dict:  # no args kwargs
-                futures = {executor.submit(self.function, item, **self.kwargs_dict): item for item in
-                            self.iterable}
-
-                print(self.kwargs_dict)
-
-            else:  # no args no kwargs
-                futures = {executor.submit(self.function, item): item for item in
-                            self.iterable}
+            futures = {executor.submit(self.function, item,
+                                       *self.args_tuple if self.args_tuple else (),
+                                       **self.kwargs_dict if self.kwargs_dict else {}): item
+                       for item in
+                       self.iterable}
 
             return [self._process_future(future) for future in concurrent.futures.as_completed(futures)]
 
