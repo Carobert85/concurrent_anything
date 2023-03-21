@@ -49,7 +49,7 @@ class _ConcurrentParent:
 
         with metafunction(max_workers) as executor:
 
-            #todo: test all iterations of this
+            # todo: test all iterations of this
 
             if self.args_tuple and self.kwargs_dict:  # args and kwargs
                 partial_executor = partial(executor.submit, *self.args, **self.kwargs_dict)
@@ -70,7 +70,8 @@ class _ConcurrentParent:
 
 
 class ThreadAnything(_ConcurrentParent):
-    def __init__(self, iterable: Collection, function: Callable, args_tuple: tuple = None, kwargs_dict: dict = None):
+    def __init__(self, iterable: Collection, function: Callable, args_tuple: tuple = None, kwargs_dict: dict = None,
+                 exception_dict={}):
         """
         Child class for threading
         :param iterable: Any python iterable you want to call concurrency on
@@ -78,7 +79,7 @@ class ThreadAnything(_ConcurrentParent):
         :param args_tuple: Tuple containing the ordered arguments that pass to the function
         :param kwargs_dict: Dictionary containing the keyword arguments that pass to the function
         """
-        super().__init__(iterable, function, args_tuple, kwargs_dict)
+        super().__init__(iterable, function, args_tuple, kwargs_dict, exception_dict)
 
     def thread_anything(self, max_workers=10):
         """
@@ -93,7 +94,8 @@ class ThreadAnything(_ConcurrentParent):
 
 
 class MultiProcessAnything(_ConcurrentParent):
-    def __init__(self, iterable: Collection, function: Callable, args_tuple: tuple = None, kwargs_dict: dict = None):
+    def __init__(self, iterable: Collection, function: Callable, args_tuple: tuple = None, kwargs_dict: dict = None,
+                 exception_dict={}):
         """
         Child class for MultiProcessing
         :param iterable: Any python iterable you want to call concurrency on
@@ -101,7 +103,7 @@ class MultiProcessAnything(_ConcurrentParent):
         :param args_tuple: Tuple containing the ordered arguments that pass to the function
         :param kwargs_dict: Dictionary containing the keyword arguments that pass to the function
         """
-        super().__init__(iterable, function, args_tuple, kwargs_dict)
+        super().__init__(iterable, function, args_tuple, kwargs_dict, exception_dict)
 
     def multiprocess_anything(self, max_workers=cpu_count() - 1):
         """
