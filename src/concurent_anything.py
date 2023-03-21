@@ -9,7 +9,7 @@ import concurrent.futures
 
 class _ConcurrentParent:
     def __init__(self, iterable: Collection, function: Callable, args_tuple: tuple = None, kwargs_dict: dict = None,
-                 exception_dict={}):
+                 exception_dict={}, item_param_name: str = None):
         """
         The _ConcurrentParent class is a private class that holds all of our common code for threading
          and multiprocessing. To use it, your function must accept the item as it's first argument.
@@ -24,6 +24,7 @@ class _ConcurrentParent:
         self.args_tuple = args_tuple
         self.kwargs_dict = kwargs_dict
         self.exception_dict = exception_dict
+        self.item_param_name = item_param_name
 
     def _process_future(self, future: concurrent.futures, log_function: Callable = print):
         """
@@ -48,23 +49,25 @@ class _ConcurrentParent:
         """
 
         with metafunction(max_workers) as executor:
-
             # todo: test all iterations of this
 
             if self.args_tuple and self.kwargs_dict:  # args and kwargs
-                partial_executor = partial(executor.submit, *self.args_tuple, **self.kwargs_dict)
+                futures = {executor.submit(self.function, item, *self.args_tuple, **self.kwargs_dict): item for item in
+                            self.iterable}
 
             elif self.args_tuple:  # args no kwargs
-                partial_executor = partial(executor.submit, *self.args_tuple),
+                futures = {executor.submit(self.function, item, *self.args_tuple): item for item in
+                            self.iterable}
 
             elif self.kwargs_dict:  # no args kwargs
-                partial_executor = partial(executor.submit, **self.kwargs_dict)
+                futures = {executor.submit(self.function, item, **self.kwargs_dict): item for item in
+                            self.iterable}
+
+                print(self.kwargs_dict)
 
             else:  # no args no kwargs
-                partial_executor = partial(executor.submit)
-
-            futures = {partial_executor(self.function, item): item for item in
-                       self.iterable}
+                futures = {executor.submit(self.function, item): item for item in
+                            self.iterable}
 
             return [self._process_future(future) for future in concurrent.futures.as_completed(futures)]
 
