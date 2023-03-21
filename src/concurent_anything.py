@@ -52,10 +52,10 @@ class _ConcurrentParent:
             # todo: test all iterations of this
 
             if self.args_tuple and self.kwargs_dict:  # args and kwargs
-                partial_executor = partial(executor.submit, *self.args, **self.kwargs_dict)
+                partial_executor = partial(executor.submit, *self.args_tuple, **self.kwargs_dict)
 
             elif self.args_tuple:  # args no kwargs
-                partial_executor = partial(executor.submit, *self.args),
+                partial_executor = partial(executor.submit, *self.args_tuple),
 
             elif self.kwargs_dict:  # no args kwargs
                 partial_executor = partial(executor.submit, **self.kwargs_dict)
