@@ -1,9 +1,6 @@
 from collections.abc import Collection
 from typing import Callable
 from multiprocessing import cpu_count
-
-from functools import partial
-
 import concurrent.futures
 
 
@@ -39,18 +36,6 @@ class _ConcurrentParent:
 
         except Exception as e:
             self.exception_dict.get(e, log_function(e))
-
-    def unpack_args(self):
-        if self.args_tuple:
-            return [*self.args_tuple]
-        else:
-            return None
-
-    # def unpack_kwargs(self):
-    #     if self.kwargs_dict:
-    #         return [**self.kwargs_dict]
-    #     else:
-    #         return None
 
     def _concurrent_function(self, metafunction, max_workers):
         """
