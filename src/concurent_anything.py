@@ -6,7 +6,7 @@ import concurrent.futures
 
 class _ConcurrentParent:
     def __init__(self, iterable: Collection, function: Callable, args_tuple: tuple = None, kwargs_dict: dict = None,
-                 exception_dict={}, item_param_name: str = None):
+                 exception_dict={}):
         """
         The _ConcurrentParent class is a private class that holds all of our common code for threading
          and multiprocessing. To use it, your function must accept the item as it's first argument.
@@ -21,7 +21,7 @@ class _ConcurrentParent:
         self.args_tuple = args_tuple
         self.kwargs_dict = kwargs_dict
         self.exception_dict = exception_dict
-        self.item_param_name = item_param_name
+                     
 
     def _process_future(self, future: concurrent.futures, log_function: Callable = print):
         """
@@ -83,7 +83,7 @@ class ThreadAnything(_ConcurrentParent):
 
 class MultiProcessAnything(_ConcurrentParent):
     def __init__(self, iterable: Collection, function: Callable, args_tuple: tuple = None, kwargs_dict: dict = None,
-                 exception_dict={}):
+                 exception_dict: dict = {}):
         """
         Child class for MultiProcessing
         :param iterable: Any python iterable you want to call concurrency on
@@ -93,7 +93,7 @@ class MultiProcessAnything(_ConcurrentParent):
         """
         super().__init__(iterable, function, args_tuple, kwargs_dict, exception_dict)
 
-    def multiprocess_anything(self, max_workers=cpu_count() - 1):
+    def multiprocess_anything(self, max_workers: int = cpu_count() - 1):
         """
         executes the concurrent_function from the parent class passing the ProcessPoolExecutor to it
         :param max_workers: defaults to 1 less then available CPU cores on the machine
